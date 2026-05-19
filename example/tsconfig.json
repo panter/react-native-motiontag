@@ -3,7 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "react-native-motiontag": ["../src/index.ts"]
+      "@panter/react-native-motiontag": ["../src/index.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"]

@@ -1,6 +1,9 @@
 {
-  "name": "react-native-motiontag",
+  "name": "@panter/react-native-motiontag",
   "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "React Native Turbo Module for the MotionTag tracking SDK",
   "keywords": [
     "react-native",

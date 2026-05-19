@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-motiontag": ["./src/index"]
+      "@panter/react-native-motiontag": ["./src/index"]
     },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

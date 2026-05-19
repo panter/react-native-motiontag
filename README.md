@@ -1,4 +1,4 @@
-# react-native-motiontag
+# @panter/react-native-motiontag
 
 Turbo Module wrapping the [MotionTag tracking SDK](https://motion-tag.com/) for
 React Native (new architecture only).
@@ -22,8 +22,8 @@ SDK v7.2.x — the platform asymmetry is hidden behind a shared TS contract.
 ## Install in your app
 
 ```sh
-yarn add react-native-motiontag
-# or:  npm install react-native-motiontag
+yarn add @panter/react-native-motiontag
+# or:  npm install @panter/react-native-motiontag
 ```
 
 Then follow **either** the Expo path (recommended) or the bare React Native
@@ -32,7 +32,7 @@ path below — pick the one that matches your project.
 ## Public API
 
 ```ts
-import MotionTag from 'react-native-motiontag'
+import MotionTag from '@panter/react-native-motiontag'
 
 await MotionTag.setUserToken(jwt)
 await MotionTag.start()
@@ -76,7 +76,7 @@ Add the plugin to `app.json`:
     "newArchEnabled": true,
     "plugins": [
       [
-        "react-native-motiontag",
+        "@panter/react-native-motiontag",
         {
           "iosPermissions": {
             "locationAlwaysAndWhenInUse": "We use your location to track your trips.",
@@ -236,7 +236,7 @@ The library and the example are independent npm packages. The example
 declares the parent via a relative path:
 
 ```json
-{ "dependencies": { "react-native-motiontag": "file:.." } }
+{ "dependencies": { "@panter/react-native-motiontag": "file:.." } }
 ```
 
 When you `yarn install` in `example/`, that resolves as a symlink to the

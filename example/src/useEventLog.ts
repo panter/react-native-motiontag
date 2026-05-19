@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import MotionTag, { type MotionTagEvent } from 'react-native-motiontag'
+import MotionTag, { type MotionTagEvent } from '@panter/react-native-motiontag'
 
 export type LogEntry = {
   id: number

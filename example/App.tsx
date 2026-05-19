@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native'
 import * as Location from 'expo-location'
-import MotionTag from 'react-native-motiontag'
+import MotionTag from '@panter/react-native-motiontag'
 
 import { loadToken, saveToken } from './src/storage'
 import { useTrackingState } from './src/useTrackingState'

@@ -1,6 +1,6 @@
 # MotionTag Demo (Expo)
 
-Small Expo app that exercises the `react-native-motiontag` library: paste a JWT,
+Small Expo app that exercises the `@panter/react-native-motiontag` library: paste a JWT,
 grant permissions, start tracking, and watch events stream in.
 
 This app is **not** Expo-Go-compatible — it depends on a native Turbo Module
@@ -25,7 +25,7 @@ npx expo prebuild --clean    # generates ios/ and android/ using the plugin
 npx expo run:ios --device    # or: npx expo run:android --device
 ```
 
-The `react-native-motiontag` Expo config plugin (in
+The `@panter/react-native-motiontag` Expo config plugin (in
 `../app.plugin.js`) wires the iOS AppDelegate
 bootstrap, Android `MainApplication.onCreate` bootstrap, Info.plist keys,
 foreground-service notification, and the Azure DevOps Maven repo for you.
