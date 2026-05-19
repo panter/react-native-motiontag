@@ -3,6 +3,12 @@ name: Release Please
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish_tag:
+        description: 'Tag to publish (e.g. v0.1.1). Leave blank to let release-please run normally.'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -12,6 +18,7 @@ jobs:
   release-please:
     name: Release PR / tag
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish_tag == '' }}
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -25,7 +32,7 @@ jobs:
   publish:
     name: Publish to npm
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && inputs.publish_tag != '') || needs.release-please.outputs.release_created == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,6 +40,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_tag || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -48,7 +57,7 @@ jobs:
         run: yarn prepare
 
       - name: Upgrade npm (Trusted Publishing requires >= 11.5.1)
-        run: npm install -g npm@latest
+        run: npm install -g --force npm@latest
 
       - name: Publish
         run: npm publish --access public
