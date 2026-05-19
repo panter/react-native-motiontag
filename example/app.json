@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "MotionTag Demo",
+    "slug": "motiontag-demo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "de.motiontag.reactnative.demo",
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIBackgroundModes": ["location", "fetch", "processing"]
+      }
+    },
+    "android": {
+      "package": "de.motiontag.reactnative.demo"
+    },
+    "plugins": [
+      [
+        "react-native-motiontag",
+        {
+          "iosPermissions": {
+            "locationAlwaysAndWhenInUse": "MotionTag Demo uses your location to demonstrate background tracking.",
+            "locationWhenInUse": "MotionTag Demo uses your location to demonstrate background tracking.",
+            "motion": "MotionTag Demo uses motion data to detect transport modes."
+          },
+          "androidNotification": {
+            "channelId": "motiontag_tracking",
+            "channelName": "MotionTag tracking",
+            "title": "MotionTag Demo",
+            "text": "Tracking is active"
+          }
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "name": "react-native-motiontag",
+  "version": "0.1.0",
+  "description": "React Native Turbo Module for the MotionTag tracking SDK",
+  "license": "MIT",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "react-native": "./src/index.ts",
+  "source": "./src/index.ts",
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "app.plugin.js",
+    "plugin",
+    "react-native-motiontag.podspec",
+    "README.md",
+    "LICENSE",
+    "!ios/build",
+    "!android/build",
+    "!**/.*"
+  ],
+  "scripts": {
+    "prepare": "bob build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.79.0"
+  },
+  "devDependencies": {
+    "@expo/config-plugins": "~55.0.0",
+    "react": "19.2.0",
+    "react-native": "0.83.6",
+    "react-native-builder-bob": "^0.40.0",
+    "typescript": "~5.6.0"
+  },
+  "codegenConfig": {
+    "name": "RNMotionTagSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "de.motiontag.reactnative"
+    }
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      ["typescript", { "project": "tsconfig.build.json" }]
+    ]
+  }
+}

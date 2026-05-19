@@ -1,0 +1,27 @@
+{
+  "name": "motiontag-demo",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "prebuild": "expo prebuild",
+    "prebuild:clean": "expo prebuild --clean"
+  },
+  "dependencies": {
+    "expo": "~55.0.24",
+    "expo-location": "~55.1.10",
+    "expo-secure-store": "~55.0.14",
+    "expo-sensors": "~55.0.15",
+    "react": "19.2.0",
+    "react-native": "0.83.6",
+    "react-native-motiontag": "file:.."
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.0",
+    "babel-preset-expo": "~55.0.0",
+    "typescript": "~5.9.2"
+  }
+}
