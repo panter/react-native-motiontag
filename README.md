@@ -18,6 +18,7 @@ SDK v7.2.x — the platform asymmetry is hidden behind a shared TS contract.
 - [Running the example app](#running-the-example-app)
 - [Repo layout](#repo-layout)
 - [Developing the package](#developing-the-package)
+- [Upgrading](#upgrading)
 - [Releasing](#releasing)
 
 ## Install in your app
@@ -267,6 +268,90 @@ re-install.
 - **Iterate on the Expo config plugin** by editing files in `plugin/` and
   re-running `npx expo prebuild --clean` in `example/`. The injected blocks
   are wrapped in `@generated` markers and de-duplicated on re-run.
+
+## Upgrading
+
+The repo has four independent upgrade axes — keep them as separate PRs / commits
+so [release-please](#releasing) classifies each one correctly. The iOS and
+Android SDK versions drift on purpose (see [AGENTS.md](AGENTS.md)) — don't align
+them just because they're both bumpable.
+
+### Where to check for new versions
+
+| What | Source |
+| --- | --- |
+| MotionTag iOS SDK changelog | [api.motion-tag.de/developer/ios?locale=en&os_aspect=changelog](https://api.motion-tag.de/developer/ios?locale=en&os_aspect=changelog) |
+| MotionTag iOS integration guide | [api.motion-tag.de/developer/ios?locale=en&os_aspect=sdk](https://api.motion-tag.de/developer/ios?locale=en&os_aspect=sdk) |
+| MotionTag Android SDK changelog | [api.motion-tag.de/developer/android?locale=en&os_aspect=changelog](https://api.motion-tag.de/developer/android?locale=en&os_aspect=changelog) |
+| MotionTag Android integration guide | [api.motion-tag.de/developer/android?locale=en&os_aspect=sdk](https://api.motion-tag.de/developer/android?locale=en&os_aspect=sdk) |
+| Expo SDK upgrade walkthrough | [docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough](https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/) |
+| Expo config-plugins changelog | [github.com/expo/expo/.../config-plugins/CHANGELOG.md](https://github.com/expo/expo/blob/main/packages/%40expo/config-plugins/CHANGELOG.md) |
+| react-native-builder-bob releases | [github.com/callstack/react-native-builder-bob/releases](https://github.com/callstack/react-native-builder-bob/releases) |
+| React Native upgrade helper (rarely needed here) | [react-native-community.github.io/upgrade-helper](https://react-native-community.github.io/upgrade-helper/) |
+
+The two MotionTag changelog endpoints are the authoritative source — the vendor
+doesn't publish a GitHub release feed. Both `locale=en` and `locale=de` work.
+
+### Pinned versions to compare against
+
+| Axis | Pinned in | Currently |
+| --- | --- | --- |
+| iOS SDK | [`react-native-motiontag.podspec`](react-native-motiontag.podspec) | `MotionTagSDK ~> 6.5.0` |
+| Android SDK | [`android/build.gradle`](android/build.gradle) | `de.motiontag:tracker:7.2.5` |
+| Example Expo SDK | [`example/package.json`](example/package.json) | `expo ~55` |
+| Library build tooling | [`package.json`](package.json) | `react-native-builder-bob`, `@expo/config-plugins`, `typescript` |
+
+### When the changelog mentions integration changes
+
+A version bump is **not** "just" a version bump when the changelog touches:
+
+- iOS `Info.plist` keys (especially `BGTaskSchedulerPermittedIdentifiers` and
+  `UIBackgroundModes`) → update both the [bare-RN snippet above](#ios--appdelegateswift)
+  and the Expo plugin's Info.plist injection in `plugin/`.
+- iOS bootstrap signature (`MotionTagBootstrap.bootstrap`,
+  `processBackgroundSessionEvents`) → update `ios/MotionTagBootstrap.swift`, the
+  README snippet, and the plugin's AppDelegate injection.
+- Android manifest permissions or foreground-service contract → update
+  `android/src/main/AndroidManifest.xml`, the plugin's manifest edits, and the
+  Android section above.
+- Android bootstrap signature (`MotionTagBootstrap.init`) → update the Kotlin
+  source, the README snippet, and the plugin's MainApplication injection.
+
+Treat these as `feat:` (or `feat!:` if hosts must change code) rather than
+`fix:` so release-please bumps the minor/major correctly.
+
+### Bumping the example app's Expo SDK
+
+The library itself is SDK-agnostic — only `example/` pins an Expo version:
+
+```sh
+cd example
+npx expo install expo@<target>
+npx expo install --fix              # realigns react, react-native, expo-*
+npx expo prebuild --clean           # mandatory across SDK majors
+npx expo run:ios && npx expo run:android
+```
+
+If the new Expo SDK pulls in an RN version above this package's peer range
+(`react-native >=0.79.0`), widen the peer range in the root `package.json` in
+the same PR. Don't tighten the lower bound.
+
+### Verifying before opening the PR
+
+After any axis bump:
+
+```sh
+yarn install && yarn prepare                        # at the root
+npx tsc -p tsconfig.build.json --noEmit             # typecheck
+cd example && yarn install
+npx expo prebuild --clean
+npx expo run:ios                                    # ideally on a device
+npx expo run:android                                # ideally on a device
+```
+
+Walk the golden path in the example: paste JWT → start → events stream → stop.
+Simulators can't generate motion-sensor data, so a physical device is the only
+way to fully validate a MotionTag SDK bump.
 
 ## Releasing
 
