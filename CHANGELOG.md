@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/panter/react-native-motiontag/compare/v0.2.0...v0.3.0) (2026-06-02)
+
+
+### Features
+
+* **android:** exclude SDK state from Auto Backup via config plugin ([#4](https://github.com/panter/react-native-motiontag/issues/4)) ([70ce1ff](https://github.com/panter/react-native-motiontag/commit/70ce1ff36629eec291085c25fc6894809c5055e6))
+
 ## [0.2.0](https://github.com/panter/react-native-motiontag/compare/v0.1.1...v0.2.0) (2026-06-02)
 
 
