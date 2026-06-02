@@ -14,6 +14,15 @@ import UIKit
         )
     }
 
+    /// Whether the given background URL session belongs to the MotionTag SDK. Use this in
+    /// `application(_:handleEventsForBackgroundURLSession:completionHandler:)` to decide whether
+    /// to forward the event to `processBackgroundSessionEvents(identifier:completionHandler:)` or
+    /// to the host's other background-session owners (e.g. Expo modules, Firebase) — each session's
+    /// completion handler must be called exactly once, by exactly one owner.
+    @objc public static func handlesBackgroundURLSession(identifier: String) -> Bool {
+        return identifier.hasPrefix("com.motion-tag.") || identifier.hasPrefix("com.motiontag.")
+    }
+
     /// Forward background URL session events so the SDK can finish background uploads on
     /// cold-launch wake-ups. Call from `application(_:handleEventsForBackgroundURLSession:completionHandler:)`.
     @objc public static func processBackgroundSessionEvents(

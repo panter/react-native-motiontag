@@ -65,10 +65,11 @@ behaviour.
 ## Setup with Expo (recommended)
 
 The package ships an Expo config plugin that wires up everything for you on
-`expo prebuild`: AppDelegate bootstrap (iOS), MainApplication bootstrap
-(Android), `Info.plist` permission + background-mode keys, foreground-service
-notification factory, the Azure DevOps Maven repo, and the extra Android
-permissions (`POST_NOTIFICATIONS`, `FOREGROUND_SERVICE`).
+`expo prebuild`: AppDelegate bootstrap + background URL session forwarding
+(iOS), MainApplication bootstrap (Android), `Info.plist` permission +
+background-mode keys, foreground-service notification factory, the Azure
+DevOps Maven repo, and the extra Android permissions (`POST_NOTIFICATIONS`,
+`FOREGROUND_SERVICE`).
 
 Add the plugin to `app.json`:
 
@@ -118,6 +119,9 @@ func application(
   _ application: UIApplication,
   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
 ) -> Bool {
+  // Must be the FIRST statement: when iOS relaunches the killed app for a
+  // background location event, the SDK has to re-arm tracking before any
+  // React Native startup work runs.
   MotionTagBootstrap.bootstrap(launchOptions: launchOptions)
   // … rest of RN bootstrap …
 }
@@ -127,10 +131,17 @@ func application(
   handleEventsForBackgroundURLSession identifier: String,
   completionHandler: @escaping () -> Void
 ) {
-  MotionTagBootstrap.processBackgroundSessionEvents(
-    identifier: identifier,
-    completionHandler: completionHandler
-  )
+  if MotionTagBootstrap.handlesBackgroundURLSession(identifier: identifier) {
+    MotionTagBootstrap.processBackgroundSessionEvents(
+      identifier: identifier,
+      completionHandler: completionHandler
+    )
+  } else {
+    // Forward sessions owned by other SDKs (Firebase, …) to their handlers, or
+    // finish them immediately if nothing else in the app uses background sessions.
+    // Each session's completion handler must be called exactly once.
+    completionHandler()
+  }
 }
 ```
 
@@ -158,8 +169,10 @@ import de.motiontag.reactnative.MotionTagBootstrap
 
 override fun onCreate() {
     super.onCreate()
-    loadReactNative(this)
+    // Init the SDK before React Native loads — the MotionTag SDK requires
+    // initialisation as early as possible in onCreate.
     MotionTagBootstrap.init(this, createNotification())
+    loadReactNative(this)
 }
 ```
 
@@ -309,8 +322,12 @@ A version bump is **not** "just" a version bump when the changelog touches:
   `UIBackgroundModes`) → update both the [bare-RN snippet above](#ios--appdelegateswift)
   and the Expo plugin's Info.plist injection in `plugin/`.
 - iOS bootstrap signature (`MotionTagBootstrap.bootstrap`,
-  `processBackgroundSessionEvents`) → update `ios/MotionTagBootstrap.swift`, the
-  README snippet, and the plugin's AppDelegate injection.
+  `processBackgroundSessionEvents`, `handlesBackgroundURLSession`) → update
+  `ios/MotionTagBootstrap.swift`, the README snippet, and the plugin's
+  AppDelegate injection. Note: `handlesBackgroundURLSession` hard-codes the
+  SDK's background URL session identifier prefixes (`com.motion-tag.` /
+  `com.motiontag.`) — re-check them against the SDK binary on every iOS SDK
+  bump (`strings MotionTagSDK | grep -i session`).
 - Android manifest permissions or foreground-service contract → update
   `android/src/main/AndroidManifest.xml`, the plugin's manifest edits, and the
   Android section above.
