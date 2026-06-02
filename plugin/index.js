@@ -6,6 +6,7 @@ const withAndroidMavenRepo = require('./withAndroidMavenRepo')
 const withAndroidManifestExtras = require('./withAndroidManifestExtras')
 const withAndroidNotification = require('./withAndroidNotification')
 const withAndroidMainApplication = require('./withAndroidMainApplication')
+const withAndroidBackupRules = require('./withAndroidBackupRules')
 
 const DEFAULTS = {
   iosPermissions: {
@@ -50,6 +51,7 @@ function withMotionTag(config, options) {
     [withAndroidManifestExtras],
     [withAndroidNotification, merged.androidNotification],
     [withAndroidMainApplication],
+    [withAndroidBackupRules],
   ])
 }
 

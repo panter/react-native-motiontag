@@ -68,8 +68,10 @@ The package ships an Expo config plugin that wires up everything for you on
 `expo prebuild`: AppDelegate bootstrap + background URL session forwarding
 (iOS), MainApplication bootstrap (Android), `Info.plist` permission +
 background-mode keys, foreground-service notification factory, the Azure
-DevOps Maven repo, and the extra Android permissions (`POST_NOTIFICATIONS`,
-`FOREGROUND_SERVICE`).
+DevOps Maven repo, the extra Android permissions (`POST_NOTIFICATIONS`,
+`FOREGROUND_SERVICE`), and Android Auto Backup rules excluding the SDK's
+state file (merged into existing backup rules, e.g. expo-secure-store's,
+when present).
 
 Add the plugin to `app.json`:
 
@@ -181,6 +183,28 @@ text, icon) — the package does not impose copy or branding. Required
 SDK permissions (`ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`,
 `ACCESS_BACKGROUND_LOCATION`, `ACTIVITY_RECOGNITION`,
 `FOREGROUND_SERVICE_LOCATION`) are merged into the host manifest by Gradle.
+
+The SDK stores its state in the `motiontag_tracker` SharedPreferences file,
+which must be excluded from Android Auto Backup — restored backups would
+otherwise resurrect stale SDK state after a reinstall. Unless the app sets
+`android:allowBackup="false"`, exclude it in both rule formats:
+
+```xml
+<!-- res/xml/backup_rules.xml — android:fullBackupContent (Android ≤ 11) -->
+<full-backup-content>
+  <exclude domain="sharedpref" path="motiontag_tracker.xml"/>
+</full-backup-content>
+
+<!-- res/xml/data_extraction_rules.xml — android:dataExtractionRules (Android 12+) -->
+<data-extraction-rules>
+  <cloud-backup>
+    <exclude domain="sharedpref" path="motiontag_tracker.xml"/>
+  </cloud-backup>
+  <device-transfer>
+    <exclude domain="sharedpref" path="motiontag_tracker.xml"/>
+  </device-transfer>
+</data-extraction-rules>
+```
 
 ## Pre-RN events
 
