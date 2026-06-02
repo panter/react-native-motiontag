@@ -133,17 +133,13 @@ func application(
   handleEventsForBackgroundURLSession identifier: String,
   completionHandler: @escaping () -> Void
 ) {
-  if MotionTagBootstrap.handlesBackgroundURLSession(identifier: identifier) {
-    MotionTagBootstrap.processBackgroundSessionEvents(
-      identifier: identifier,
-      completionHandler: completionHandler
-    )
-  } else {
-    // Forward sessions owned by other SDKs (Firebase, …) to their handlers, or
-    // finish them immediately if nothing else in the app uses background sessions.
-    // Each session's completion handler must be called exactly once.
-    completionHandler()
-  }
+  // Forward every identifier unconditionally — the SDK decides internally
+  // which sessions are its own. If the app uses Firebase, also call its
+  // handleEvents(forBackgroundURLSession:) here (see the MotionTag iOS guide).
+  MotionTagBootstrap.processBackgroundSessionEvents(
+    identifier: identifier,
+    completionHandler: completionHandler
+  )
 }
 ```
 
@@ -346,12 +342,8 @@ A version bump is **not** "just" a version bump when the changelog touches:
   `UIBackgroundModes`) → update both the [bare-RN snippet above](#ios--appdelegateswift)
   and the Expo plugin's Info.plist injection in `plugin/`.
 - iOS bootstrap signature (`MotionTagBootstrap.bootstrap`,
-  `processBackgroundSessionEvents`, `handlesBackgroundURLSession`) → update
-  `ios/MotionTagBootstrap.swift`, the README snippet, and the plugin's
-  AppDelegate injection. Note: `handlesBackgroundURLSession` hard-codes the
-  SDK's background URL session identifier prefixes (`com.motion-tag.` /
-  `com.motiontag.`) — re-check them against the SDK binary on every iOS SDK
-  bump (`strings MotionTagSDK | grep -i session`).
+  `processBackgroundSessionEvents`) → update `ios/MotionTagBootstrap.swift`, the
+  README snippet, and the plugin's AppDelegate injection.
 - Android manifest permissions or foreground-service contract → update
   `android/src/main/AndroidManifest.xml`, the plugin's manifest edits, and the
   Android section above.
