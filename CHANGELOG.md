@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/panter/react-native-motiontag/compare/v0.3.0...v0.3.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* **ios:** forward all background URL session events to the SDK per docs ([#6](https://github.com/panter/react-native-motiontag/issues/6)) ([0f02219](https://github.com/panter/react-native-motiontag/commit/0f02219dfd77cd5784c14f3a9b12f2e650e7f90f))
+
 ## [0.3.0](https://github.com/panter/react-native-motiontag/compare/v0.2.0...v0.3.0) (2026-06-02)
 
 
