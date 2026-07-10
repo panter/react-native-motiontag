@@ -333,7 +333,7 @@ doesn't publish a GitHub release feed. Both `locale=en` and `locale=de` work.
 | --- | --- | --- |
 | iOS SDK | [`react-native-motiontag.podspec`](react-native-motiontag.podspec) | `MotionTagSDK ~> 7.0.0` |
 | Android SDK | [`android/build.gradle`](android/build.gradle) | `de.motiontag:tracker:7.2.5` |
-| Example Expo SDK | [`example/package.json`](example/package.json) | `expo ~55` |
+| Example Expo SDK | [`example/package.json`](example/package.json) | `expo ~57` |
 | Library build tooling | [`package.json`](package.json) | `react-native-builder-bob`, `@expo/config-plugins`, `typescript` |
 
 ### When the changelog mentions integration changes

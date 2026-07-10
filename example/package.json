@@ -11,17 +11,17 @@
     "prebuild:clean": "expo prebuild --clean"
   },
   "dependencies": {
-    "expo": "~55.0.24",
-    "expo-location": "~55.1.10",
-    "expo-secure-store": "~55.0.14",
-    "expo-sensors": "~55.0.15",
-    "react": "19.2.0",
-    "react-native": "0.83.6",
-    "@panter/react-native-motiontag": "file:.."
+    "@panter/react-native-motiontag": "file:..",
+    "expo": "^57.0.0",
+    "expo-location": "~57.0.2",
+    "expo-secure-store": "~57.0.0",
+    "expo-sensors": "~57.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.0"
   },
   "devDependencies": {
     "@types/react": "~19.2.0",
-    "babel-preset-expo": "~55.0.0",
-    "typescript": "~5.9.2"
+    "babel-preset-expo": "~57.0.0",
+    "typescript": "~6.0.3"
   }
 }
