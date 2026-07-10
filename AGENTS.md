@@ -6,7 +6,7 @@ before making changes — most of it is not derivable from the code alone.
 ## What this repo is
 
 A React Native Turbo Module (`@panter/react-native-motiontag`) wrapping
-the MotionTag tracking SDKs (iOS 6.5.x, Android 7.2.x). New architecture
+the MotionTag tracking SDKs (iOS 7.0.x, Android 7.2.x). New architecture
 only. JS surface mirrors the official Flutter SDK so payloads stay
 interchangeable.
 

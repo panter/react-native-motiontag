@@ -62,7 +62,7 @@ asymmetry between iOS and Android, and the known smells.
 │  ios/cyclomania-Bridging-Header  │         │   MotionTag.Callback singleton         │
 │   exposes TrackingSDK.h to Swift │         │                                        │
 │                                  │         │  MotionTagPackage.java                 │
-│  Pod: MotionTagSDK ~> 6.5.0      │         │   ReactPackage registering the module  │
+│  Pod: MotionTagSDK ~> 7.0.0      │         │   ReactPackage registering the module  │
 │                                  │         │  Dep: de.motiontag:tracker:7.2.5       │
 └──────────────────────────────────┘         └────────────────────────────────────────┘
 ```
@@ -79,7 +79,7 @@ the main reason a refactor will need to be careful.
 
 | Platform | Dependency | Version | Source |
 | --- | --- | --- | --- |
-| iOS | `MotionTagSDK` | `~> 6.5.0` | CocoaPods (`ios/Podfile:35`) |
+| iOS | `MotionTagSDK` | `~> 7.0.0` | CocoaPods (`ios/Podfile:35`) |
 | Android | `de.motiontag:tracker` | `7.2.5` | Azure DevOps Maven repo (`android/build.gradle:27-29`) |
 
 The iOS framework is also referenced as a binary in `ios/Frameworks/` and
@@ -649,7 +649,7 @@ before the first `Activity` (`MainApplication.kt:55`).
 
 | Concern | iOS | Android |
 | --- | --- | --- |
-| SDK major version | 6 (`MotionTagSDK ~> 6.5.0`) | 7 (`de.motiontag:tracker:7.2.5`) |
+| SDK major version | 7 (`MotionTagSDK ~> 7.0.0`) | 7 (`de.motiontag:tracker:7.2.5`) |
 | Integration style | `MotionTagDelegate` (callback methods on a delegate object) | `MotionTag.Callback` with sealed `Event` hierarchy in `onEvent(event)` |
 | Module init point | `AppDelegate.didFinishLaunchingWithOptions` | `MainApplication.onCreate` |
 | Foreground service | not applicable | required `Notification` passed to `MotionTag.initialize` |

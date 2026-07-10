@@ -1,10 +1,9 @@
 #import "MotionTagModule.h"
 
 #import <React/RCTLog.h>
-// Import the SDK before the Swift bridge so the bridge's reference to
-// MotionTagDelegate (used as a protocol conformance on
-// MotionTagDelegateImpl) is satisfied.
-#import <MotionTagSDK/MotionTagSDK.h>
+// MotionTagSDK ships no Objective-C headers since v7 — it is a pure Swift module. All SDK
+// access goes through MotionTagDelegateImpl, whose generated header omits the (non-@objc)
+// MotionTagDelegate conformance, so nothing here needs to see the SDK.
 // Swift generated header: CocoaPods only exposes it via the framework-style
 // include when the pod is built as a framework (use_frameworks!). In the
 // default static-library mode it stays in DerivedSources and is only
@@ -33,16 +32,20 @@ RCT_EXPORT_MODULE(MotionTag)
     return @[@"MotionTagEvent"];
 }
 
+// MotionTagDelegateImpl is @MainActor-isolated (the SDK's delegate protocol requires it), so
+// every call into it below hops to the main queue first.
 - (void)startObserving
 {
     _hasListeners = YES;
     __weak __typeof(self) weakSelf = self;
-    [MotionTagDelegateImpl.shared setEventCallback:^(NSDictionary<NSString *, id> *event) {
-        __strong __typeof(weakSelf) strongSelf = weakSelf;
-        if (strongSelf && strongSelf->_hasListeners) {
-            [strongSelf sendEventWithName:@"MotionTagEvent" body:event];
-        }
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MotionTagDelegateImpl.shared setEventCallback:^(NSDictionary<NSString *, id> *event) {
+            __strong __typeof(weakSelf) strongSelf = weakSelf;
+            if (strongSelf && strongSelf->_hasListeners) {
+                [strongSelf sendEventWithName:@"MotionTagEvent" body:event];
+            }
+        }];
+    });
 }
 
 - (void)stopObserving
@@ -72,20 +75,25 @@ RCT_EXPORT_MODULE(MotionTag)
              resolve:(RCTPromiseResolveBlock)resolve
               reject:(RCTPromiseRejectBlock)reject
 {
-    [MotionTagDelegateImpl.shared setUserToken:jwt];
-    resolve(nil);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MotionTagDelegateImpl.shared setUserToken:jwt];
+        resolve(nil);
+    });
 }
 
 - (void)getUserToken:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
-    // MotionTag iOS SDK v6 does not expose a public getUserToken API.
-    // Resolve to nil so JS callers can detect "not implemented on this platform".
-    resolve([NSNull null]);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString *token = [MotionTagDelegateImpl.shared getUserToken];
+        resolve(token ?: [NSNull null]);
+    });
 }
 
 - (void)isTrackingActive:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
-    resolve(@([MotionTagDelegateImpl.shared isTrackingActive]));
+    dispatch_async(dispatch_get_main_queue(), ^{
+        resolve(@([MotionTagDelegateImpl.shared isTrackingActive]));
+    });
 }
 
 - (void)isPowerSaveModeEnabled:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
@@ -102,20 +110,29 @@ RCT_EXPORT_MODULE(MotionTag)
 
 - (void)getWifiOnlyDataTransfer:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
-    // Not exposed by the v6 iOS SDK; return false until v7 migration.
-    resolve(@NO);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        resolve(@([MotionTagDelegateImpl.shared getWifiOnlyDataTransfer]));
+    });
 }
 
 - (void)setWifiOnlyDataTransfer:(BOOL)wifiOnly
                         resolve:(RCTPromiseResolveBlock)resolve
                          reject:(RCTPromiseRejectBlock)reject
 {
-    reject(@"UNSUPPORTED", @"setWifiOnlyDataTransfer is not supported on iOS (MotionTag SDK v6).", nil);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MotionTagDelegateImpl.shared setWifiOnlyDataTransfer:wifiOnly];
+        resolve(nil);
+    });
 }
 
 - (void)clearData:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
-    reject(@"UNSUPPORTED", @"clearData is not supported on iOS (MotionTag SDK v6).", nil);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // The SDK returns the number of cleared records; the JS contract is Promise<void>,
+        // and Android resolves null. Discard it rather than diverge.
+        [MotionTagDelegateImpl.shared clearData];
+        resolve(nil);
+    });
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

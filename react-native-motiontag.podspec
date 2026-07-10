@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.swift_versions = ["5.0"]
 
-  s.dependency "MotionTagSDK", "~> 6.5.0"
+  s.dependency "MotionTagSDK", "~> 7.0.0"
 
   install_modules_dependencies(s)
 end

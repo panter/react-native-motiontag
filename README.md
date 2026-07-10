@@ -4,7 +4,7 @@ Turbo Module wrapping the [MotionTag tracking SDK](https://motion-tag.com/) for
 React Native (new architecture only).
 
 The JS surface mirrors the [official Flutter SDK](https://github.com/MOTIONTAG/motiontag-sdk-flutter)
-so payloads are interchangeable. Bridges the iOS SDK v6.5.x and the Android
+so payloads are interchangeable. Bridges the iOS SDK v7.0.x and the Android
 SDK v7.2.x — the platform asymmetry is hidden behind a shared TS contract.
 
 ## Contents
@@ -56,11 +56,10 @@ own `EventSubscription`. The `MotionTagEvent` discriminated union covers
 `batteryOptimizationsChanged` (Android), and a fall-through `log` channel
 that carries the diagnostic string format the underlying SDKs emit.
 
-The platform-only methods (`isPowerSaveModeEnabled`,
-`isBatteryOptimizationsEnabled` on Android; `getWifiOnlyDataTransfer` /
-`setWifiOnlyDataTransfer` / `clearData` on Android) resolve to safe defaults
-(`false`) or reject (`'UNSUPPORTED'`) on iOS, matching the Flutter SDK's
-behaviour.
+`getUserToken`, `getWifiOnlyDataTransfer`, `setWifiOnlyDataTransfer` and
+`clearData` work on both platforms. The Android-only methods
+(`isPowerSaveModeEnabled`, `isBatteryOptimizationsEnabled`) resolve to `false`
+on iOS, matching the Flutter SDK's behaviour.
 
 ## Setup with Expo (recommended)
 
@@ -130,18 +129,21 @@ func application(
 
 func application(
   _ application: UIApplication,
-  handleEventsForBackgroundURLSession identifier: String,
-  completionHandler: @escaping () -> Void
-) {
-  // Forward every identifier unconditionally — the SDK decides internally
-  // which sessions are its own. If the app uses Firebase, also call its
-  // handleEvents(forBackgroundURLSession:) here (see the MotionTag iOS guide).
-  MotionTagBootstrap.processBackgroundSessionEvents(
-    identifier: identifier,
-    completionHandler: completionHandler
-  )
+  handleEventsForBackgroundURLSession identifier: String
+) async {
+  // Forward every identifier unconditionally — a foreign identifier is a
+  // cheap no-op. UIKit invokes the underlying completion handler once this
+  // method returns.
+  await MotionTagBootstrap.processBackgroundSessionEvents(identifier: identifier)
 }
 ```
+
+If the app owns **other** background URL sessions (Firebase, downloads), `await`
+them from this same method. The completion handler must be invoked exactly once,
+and since SDK v7 MotionTag no longer inspects it — so it can no longer tell you
+whether a session was its own. A host that instead uses the completion-handler
+overload, `processBackgroundSessionEvents(identifier:completionHandler:)`, is
+responsible for chaining rather than calling the handler from each SDK.
 
 The host's `Info.plist` must declare:
 
@@ -214,7 +216,7 @@ practice this is rare and only affects authorization-status changes; the
 
 | Platform | Version | Source |
 | --- | --- | --- |
-| iOS | `MotionTagSDK ~> 6.5.0` | CocoaPods trunk (transitive from this pod) |
+| iOS | `MotionTagSDK ~> 7.0.0` | CocoaPods trunk (transitive from this pod) |
 | Android | `de.motiontag:tracker:7.2.5` | `pkgs.dev.azure.com/motiontag/releases` (Maven repo declared in this package) |
 
 The two SDKs are intentionally out of sync — aligning them is tracked as
@@ -329,7 +331,7 @@ doesn't publish a GitHub release feed. Both `locale=en` and `locale=de` work.
 
 | Axis | Pinned in | Currently |
 | --- | --- | --- |
-| iOS SDK | [`react-native-motiontag.podspec`](react-native-motiontag.podspec) | `MotionTagSDK ~> 6.5.0` |
+| iOS SDK | [`react-native-motiontag.podspec`](react-native-motiontag.podspec) | `MotionTagSDK ~> 7.0.0` |
 | Android SDK | [`android/build.gradle`](android/build.gradle) | `de.motiontag:tracker:7.2.5` |
 | Example Expo SDK | [`example/package.json`](example/package.json) | `expo ~55` |
 | Library build tooling | [`package.json`](package.json) | `react-native-builder-bob`, `@expo/config-plugins`, `typescript` |
