@@ -83,8 +83,10 @@ RCT_EXPORT_MODULE(MotionTag)
 
 - (void)getUserToken:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
-    // Not wired to the SDK yet. Resolve to nil so JS callers can detect "not implemented here".
-    resolve([NSNull null]);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString *token = [MotionTagDelegateImpl.shared getUserToken];
+        resolve(token ?: [NSNull null]);
+    });
 }
 
 - (void)isTrackingActive:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
@@ -108,20 +110,29 @@ RCT_EXPORT_MODULE(MotionTag)
 
 - (void)getWifiOnlyDataTransfer:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
-    // Not wired to the SDK yet.
-    resolve(@NO);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        resolve(@([MotionTagDelegateImpl.shared getWifiOnlyDataTransfer]));
+    });
 }
 
 - (void)setWifiOnlyDataTransfer:(BOOL)wifiOnly
                         resolve:(RCTPromiseResolveBlock)resolve
                          reject:(RCTPromiseRejectBlock)reject
 {
-    reject(@"UNSUPPORTED", @"setWifiOnlyDataTransfer is not implemented on iOS.", nil);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MotionTagDelegateImpl.shared setWifiOnlyDataTransfer:wifiOnly];
+        resolve(nil);
+    });
 }
 
 - (void)clearData:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject
 {
-    reject(@"UNSUPPORTED", @"clearData is not implemented on iOS.", nil);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // The SDK returns the number of cleared records; the JS contract is Promise<void>,
+        // and Android resolves null. Discard it rather than diverge.
+        [MotionTagDelegateImpl.shared clearData];
+        resolve(nil);
+    });
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

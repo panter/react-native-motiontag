@@ -24,6 +24,10 @@ public typealias MotionTagEventCallback = ([String: Any]) -> Void
         motionTag.userToken = jwt
     }
 
+    @objc public func getUserToken() -> String? {
+        return motionTag.userToken
+    }
+
     @objc public func startTracking() {
         motionTag.start()
     }
@@ -34,6 +38,20 @@ public typealias MotionTagEventCallback = ([String: Any]) -> Void
 
     @objc public func isTrackingActive() -> Bool {
         return motionTag.isTrackingActive
+    }
+
+    @objc public func getWifiOnlyDataTransfer() -> Bool {
+        return motionTag.wifiOnlyDataTransfer
+    }
+
+    @objc public func setWifiOnlyDataTransfer(_ wifiOnly: Bool) {
+        motionTag.wifiOnlyDataTransfer = wifiOnly
+    }
+
+    /// Returns the number of cleared records, which the JS contract discards.
+    @discardableResult
+    @objc public func clearData() -> Int {
+        return motionTag.clearData()
     }
 
     @objc public func setEventCallback(_ callback: @escaping MotionTagEventCallback) {

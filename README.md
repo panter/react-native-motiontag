@@ -56,11 +56,10 @@ own `EventSubscription`. The `MotionTagEvent` discriminated union covers
 `batteryOptimizationsChanged` (Android), and a fall-through `log` channel
 that carries the diagnostic string format the underlying SDKs emit.
 
-The platform-only methods (`isPowerSaveModeEnabled`,
-`isBatteryOptimizationsEnabled` on Android; `getWifiOnlyDataTransfer` /
-`setWifiOnlyDataTransfer` / `clearData` on Android) resolve to safe defaults
-(`false`) or reject (`'UNSUPPORTED'`) on iOS, matching the Flutter SDK's
-behaviour.
+`getUserToken`, `getWifiOnlyDataTransfer`, `setWifiOnlyDataTransfer` and
+`clearData` work on both platforms. The Android-only methods
+(`isPowerSaveModeEnabled`, `isBatteryOptimizationsEnabled`) resolve to `false`
+on iOS, matching the Flutter SDK's behaviour.
 
 ## Setup with Expo (recommended)
 
