@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/panter/react-native-motiontag/compare/v0.3.1...v0.4.0) (2026-07-10)
+
+
+### Features
+
+* **ios:** migrate to MotionTag iOS SDK 7.0.0 ([#9](https://github.com/panter/react-native-motiontag/issues/9)) ([93791c6](https://github.com/panter/react-native-motiontag/commit/93791c640e940ea9888992e84b56d20b3e3deb67))
+
 ## [0.3.1](https://github.com/panter/react-native-motiontag/compare/v0.3.0...v0.3.1) (2026-06-02)
 
 
