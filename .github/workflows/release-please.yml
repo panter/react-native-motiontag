@@ -56,10 +56,14 @@ jobs:
       - name: Build
         run: yarn prepare
 
-      - name: Ensure npm >= 11.5.1 (Trusted Publishing)
+      # npm 12.0.0 ships a libnpmpublish that fails OIDC/provenance publishes
+      # with MODULE_NOT_FOUND on 'sigstore' (broke the v0.4.0 release), so
+      # stay on the 11.x line — it satisfies the >= 11.5.1 Trusted
+      # Publishing floor.
+      - name: Ensure npm 11.x >= 11.5.1 (Trusted Publishing)
         run: |
           npm --version
-          npm install -g npm@latest
+          npm install -g npm@11
           npm --version
 
       - name: Publish
