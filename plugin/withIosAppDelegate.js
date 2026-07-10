@@ -14,18 +14,26 @@ const BOOTSTRAP_CALL = `    // MotionTag SDK must initialise before React Native
 
 // Background uploads run in a background URL session. When iOS wakes the
 // (possibly killed) app to deliver its events, they must reach the SDK.
-// Per the MotionTag iOS guide (and the official Flutter SDK's AppDelegate),
-// every identifier is forwarded unconditionally — the SDK decides internally
-// which sessions are its own and only calls the completion handler for those.
+// Every identifier is forwarded unconditionally — since SDK v7 the SDK no
+// longer inspects the handler, so it can no longer tell us whether a session
+// is its own; forwarding a foreign identifier is a cheap no-op.
+//
+// The completion handler is passed to `super`, not called here: ExpoAppDelegate
+// fans the event out to its subscribers and invokes the handler exactly once
+// (immediately, when there are none). Calling it here as well would invoke a
+// background completion handler twice and skip every Expo subscriber.
 const BACKGROUND_SESSION_OVERRIDE = `  public override func application(
     _ application: UIApplication,
     handleEventsForBackgroundURLSession identifier: String,
     completionHandler: @escaping () -> Void
   ) {
-    MotionTagBootstrap.processBackgroundSessionEvents(
-      identifier: identifier,
-      completionHandler: completionHandler
-    )
+    MotionTagBootstrap.processBackgroundSessionEvents(identifier: identifier) {
+      super.application(
+        application,
+        handleEventsForBackgroundURLSession: identifier,
+        completionHandler: completionHandler
+      )
+    }
   }`
 
 /**

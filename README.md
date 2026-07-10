@@ -130,18 +130,21 @@ func application(
 
 func application(
   _ application: UIApplication,
-  handleEventsForBackgroundURLSession identifier: String,
-  completionHandler: @escaping () -> Void
-) {
-  // Forward every identifier unconditionally — the SDK decides internally
-  // which sessions are its own. If the app uses Firebase, also call its
-  // handleEvents(forBackgroundURLSession:) here (see the MotionTag iOS guide).
-  MotionTagBootstrap.processBackgroundSessionEvents(
-    identifier: identifier,
-    completionHandler: completionHandler
-  )
+  handleEventsForBackgroundURLSession identifier: String
+) async {
+  // Forward every identifier unconditionally — a foreign identifier is a
+  // cheap no-op. UIKit invokes the underlying completion handler once this
+  // method returns.
+  await MotionTagBootstrap.processBackgroundSessionEvents(identifier: identifier)
 }
 ```
+
+If the app owns **other** background URL sessions (Firebase, downloads), `await`
+them from this same method. The completion handler must be invoked exactly once,
+and since SDK v7 MotionTag no longer inspects it — so it can no longer tell you
+whether a session was its own. A host that instead uses the completion-handler
+overload, `processBackgroundSessionEvents(identifier:completionHandler:)`, is
+responsible for chaining rather than calling the handler from each SDK.
 
 The host's `Info.plist` must declare:
 
