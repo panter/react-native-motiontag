@@ -281,9 +281,16 @@ declares the parent via a relative path:
 { "dependencies": { "@panter/react-native-motiontag": "file:.." } }
 ```
 
-When you `yarn install` in `example/`, that resolves as a symlink to the
-parent — edit library source and changes show up in the example without a
-re-install.
+When you `yarn install` in `example/`, yarn v1 **copies** the parent folder
+into `example/node_modules/@panter/react-native-motiontag` (it is not a
+symlink). Two consequences:
+
+- After editing native code (`ios/`, `android/`) or `plugin/`, re-sync the
+  copy before rebuilding — re-run `yarn install` in `example/`, or rsync the
+  changed files into the copy.
+- The copy includes whatever `node_modules` the parent had at install time.
+  If `npx expo-doctor` reports duplicate `react` / `react-native`, delete
+  `example/node_modules/@panter/react-native-motiontag/node_modules`.
 
 ## Developing the package
 
@@ -326,6 +333,18 @@ them just because they're both bumpable.
 
 The two MotionTag changelog endpoints are the authoritative source — the vendor
 doesn't publish a GitHub release feed. Both `locale=en` and `locale=de` work.
+Read the **full delta** since the pinned version, not just the newest entry.
+
+If an endpoint 5xxs, retry with the other locale. Fallbacks: the
+[CocoaPods listing](https://cocoapods.org/pods/MotionTagSDK) shows published
+iOS versions (no changelog bodies); the Android Maven repo is private, so
+check the developer portal in a browser. Don't ship a bump whose changelog
+you couldn't read.
+
+The Expo walkthrough page above is only a link hub — the actual breakage
+lists live in the per-SDK release notes at `expo.dev/changelog/sdk-<N>`.
+When jumping more than one SDK major, read every intermediate one (e.g. the
+55→57 jump picked up SDK 56's Xcode 26.4 / iOS 16.4 minimums).
 
 ### Pinned versions to compare against
 
@@ -363,9 +382,17 @@ The library itself is SDK-agnostic — only `example/` pins an Expo version:
 cd example
 npx expo install expo@<target>
 npx expo install --fix              # realigns react, react-native, expo-*
+npx expo-doctor                     # catches removed app.json keys, dupes
 npx expo prebuild --clean           # mandatory across SDK majors
 npx expo run:ios && npx expo run:android
 ```
+
+If `expo-doctor` flags duplicate `react` / `react-native` under
+`example/node_modules/@panter/react-native-motiontag/node_modules`, delete
+that nested folder (see [Repo layout](#repo-layout)). Also align the root
+`devDependencies` (`react`, `react-native`, `@expo/config-plugins`) with the
+new SDK in the same PR, so `bob build` and tsc check against the RN the
+example actually runs.
 
 If the new Expo SDK pulls in an RN version above this package's peer range
 (`react-native >=0.79.0`), widen the peer range in the root `package.json` in
