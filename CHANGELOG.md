@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/panter/react-native-motiontag/compare/v0.4.0...v0.4.1) (2026-07-10)
+
+
+### Miscellaneous Chores
+
+* release 0.4.1 ([#15](https://github.com/panter/react-native-motiontag/issues/15)) ([7e99ef7](https://github.com/panter/react-native-motiontag/commit/7e99ef7d16c3d404341e67fec132b5da7925a540))
+
 ## [0.4.0](https://github.com/panter/react-native-motiontag/compare/v0.3.1...v0.4.0) (2026-07-10)
 
 
